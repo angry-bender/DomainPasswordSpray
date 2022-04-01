@@ -53,6 +53,10 @@ function Invoke-DomainPasswordSpray{
     .PARAMETER UsernameAsPassword
 
     For each user, will try that user's name as their password
+    
+    .PARAMETER TimeBetweenSpray
+    
+    Amount of time between sprays ( default: automatic )
 
     .EXAMPLE
 
