@@ -125,7 +125,7 @@ function Invoke-DomainPasswordSpray{
      
      [Parameter(Position = 10, Mandatory = $false)]
      [int]
-     $TimeBetweenSpray=0
+     $TimeBetweenSpray=0,
 
      [Parameter(Position = 11, Mandatory = $false)]
      [switch]
